@@ -1,0 +1,27 @@
+* REVAMP
+  Change tiles to 2-ples, put them in a 2d array
+  Alternatively, make Assemblage.Map have a 2d array of component lists 
+  and a slot for entiites, items, props
+  Or: do Assemblage.Map and have EntitySlot, ItemList, PropSlot as components
+* Inventory?
+  Think about how equipment will work
+   - (separate components for head, torso, feet?)
+   - One equipment component with slots for head, torso, feet?
+* Message passing for combat
+  - Iterate through attacker's equipment looking for +-ATK mods and apply them
+  - Iterate through defender's equipment looking for +-DEF mods and apply them
+* Spells?
+* Stats & Experience
+* Views & Menus for inventory, stats, etc.
+* THOUGHTS
+  Change message passing a bit: add handlers to components or make them
+  return handlers that systems execute
+  ex. Collideable: return execute() which bumps the initiator back to its
+                   previous position and fires off damage?
+      HP: handler for Damage, on_damage() which lowers health by 
+          attacker's attack - defender's defense 
+      Carrieable: on_pickup() -> put it in actor's inventory
+      For future things: blowable -> on_blow() move target in direction of air
+      burnable -> on_burn() maybe destroy the target or something or start a timer
+      
+      

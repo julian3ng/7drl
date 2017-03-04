@@ -1,0 +1,67 @@
+
+components.py,549
+class Component(10,377
+    def initialize(18,633
+    def add_to(22,746
+    def rm_from(26,859
+    def entities(30,937
+    def components(34,1016
+    def entities_with(44,1353
+    def __str__(50,1572
+    def table_str(56,1783
+class Location(61,1916
+    def __init__(62,1943
+    def intersects(69,2089
+    def out_of_bounds(73,2181
+class RenderData(77,2284
+    def __init__(78,2313
+class AI(83,2407
+class Player(87,2439
+class NPC(91,2468
+class Camera(95,2494
+class HP(99,2523
+    def __init__(100,2544
+class Collideable(104,2604
+
+ecs.py,434
+def fire_player_action(15,477
+def fire_npc_actions(49,1292
+def update_physics(59,1582
+def update_collisions(90,2484
+def initialize_render(99,2590
+def update_render(109,2753
+def terminate_render(135,3520
+class Assemblage(149,3986
+    def Player(154,4078
+    def Orc(164,4379
+    def Floor(174,4673
+    def Wall(181,4869
+class Engine(195,5410
+    def initialize(203,5666
+    def main(215,6021
+    def terminate(227,6358
+
+entity.py,40
+class Entity(1,0
+    def create(8,109
+
+events.py,391
+class Event(10,376
+    def initialize(15,483
+    def add(21,624
+    def pop(25,699
+    def peek(30,842
+class ActorMoved(35,968
+    def __init__(36,993
+    def execute(41,1099
+    def undo(48,1361
+class Collision(54,1551
+    def __init__(55,1575
+class Damage(61,1727
+    def __init__(62,1748
+class Refresh(67,1839
+    def __init__(68,1861
+class Quit(72,1924
+def fire(76,1954
+
+constants.py,0

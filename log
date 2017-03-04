@@ -1,0 +1,7 @@
+INFO:root:===TURN 0===
+INFO:root:===TURN 1===
+INFO:root:===TURN 2===
+INFO:root:===TURN 3===
+INFO:root:===TURN 4===
+INFO:root:0 has 3 now: [('A', 3), ('B', None), ('C', None), ('D', None), ('E', None), ('F', None), ('G', None), ('H', None), ('I', None), ('J', None), ('K', None), ('L', None), ('M', None), ('N', None), ('O', None), ('P', None), ('Q', None), ('R', None), ('S', None), ('T', None), ('U', None), ('V', None), ('W', None), ('X', None), ('Y', None), ('a', None), ('b', None), ('c', None), ('d', None), ('e', None), ('f', None), ('g', None), ('h', None), ('i', None), ('j', None), ('k', None), ('l', None), ('m', None), ('n', None), ('o', None), ('p', None), ('q', None), ('r', None), ('s', None), ('t', None), ('u', None), ('v', None), ('w', None), ('x', None), ('y', None)]
+INFO:root:===TURN 5===

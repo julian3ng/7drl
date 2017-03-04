@@ -1,0 +1,24 @@
+# THIS MUST ALWAYS BE ODD
+SCREEN_WIDTH = 19
+SCREEN_HEIGHT = 19
+
+MAP_WIDTH = 50
+MAP_HEIGHT = 50
+
+MSG_LOG_WIDTH = SCREEN_WIDTH
+MSG_LOG_HEIGHT = 11
+
+# [A-Za-z] is 52 letters for inventory slots
+INV_MAX = 52
+
+NUM_RENDER_LAYERS = 5
+FRONT = 4
+MID_FRONT = 3
+MID = 2
+MID_BACK = 1
+BACK = 0
+RENDER_LAYERS = [BACK, MID_BACK, MID, MID_FRONT, FRONT]
+
+
+def in_bounds(x, y):
+    return 0 <= x < MAP_WIDTH and 0 <= y < MAP_HEIGHT
