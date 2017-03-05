@@ -8,4 +8,3 @@ class Entity(object):
     def create():
         Entity.num_entities += 1
         return Entity.num_entities - 1
-

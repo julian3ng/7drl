@@ -13,7 +13,21 @@ from assemblage import *
 from constants import *
 from components import *
 from events import *
-from random import randint
+from mapgen import *
+
+
+
+def my_log(log_str):
+    fire(Log(log_str))
+    logging.info(log_str)
+
+
+def generate_map():
+    the_map = [[None for y in range(MAP_HEIGHT)]
+               for x in range(MAP_WIDTH)]
+
+    cellular_automata(the_map, wall_percentage=45,
+                      smooth_iters=2, smooth_threshold=5)
 
 
 def fire_player_action(ipt):
@@ -90,8 +104,6 @@ def update_camera():
     if player_loc.y > MAP_HEIGHT - 1 - SCREEN_HEIGHT // 2:
         camera_loc.y = MAP_HEIGHT - 1 - SCREEN_HEIGHT // 2
 
-    fire(Refresh(camera_entity))
-
 
 def update_physics():
     action = ActorMoved.pop()
@@ -111,9 +123,7 @@ def update_physics():
     if Location.out_of_bounds(actor_location):
         action.undo()
 
-    # May need to refresh this entity on screen
     fire(Refresh(actor))
-
     # Get the next entity that collides with the entity that just moved;
     # We may need to undo our move
     # next(..., None) makes it return None if we hit StopIteration
@@ -196,29 +206,41 @@ def resolve_death():
     AI.rm_group_from(d.target)
     RenderData.get_component(d.target).glyph = "%"
     RenderData.get_component(d.target).layer = MID
+    Prop.add_to(d.target)
     Collideable.get_component(d.target).blocks = False
+    fire(Refresh(d.target))
 
-    
+
+
 def initialize_render():
     stdscr = curses.initscr()
     curses.noecho()
     curses.cbreak()
     curses.curs_set(0)
     stdscr.keypad(True)
-    return stdscr
+
+    pads = [curses.newpad(MAP_HEIGHT + 1, MAP_WIDTH + 1)
+            for _ in range(NUM_RENDER_LAYERS)]
+
+    message_log = curses.newwin(MSG_LOG_HEIGHT, MSG_LOG_WIDTH,
+                                SCREEN_HEIGHT + 1, 1)
+    status_log = curses.newwin(STAT_LOG_HEIGHT, STAT_LOG_WIDTH,
+                               1, SCREEN_WIDTH + 1)
+
+    message_log.idlok(True)
+    message_log.scrollok(True)
+
+    return stdscr, pads, message_log, status_log
 
 
-def update_render(stdscr, pads):
-    # clear the front layers (where we draw things that move a lot)
-    #pads[FRONT].clear()
-    pads[MID_FRONT].clear()
-    pads[MID].clear()
-
+def update_render(stdscr, pads, msg_log, stat_log):
     # render props
     props = Component.entities_with(Prop, Location, RenderData)
     for p in props:
         render = RenderData.get_component(entity=p)
         location = Location.get_component(entity=p)
+        pads[render.last_layer].delch(location.y, location.x)
+        pads[render.last_layer].insch(location.y, location.x, ' ')
         pads[render.layer].addch(location.y, location.x, render.glyph)
 
     # render anything that changed
@@ -228,25 +250,52 @@ def update_render(stdscr, pads):
         return
 
     while refreshee is not None:
+
         render = RenderData.get_component(entity=refreshee.entity)
         location = Location.get_component(entity=refreshee.entity)
 
-        pads[render.layer].delch(location.last_y, location.last_x)
-        pads[render.layer].insch(location.last_y, location.last_x, ' ')
+        pads[render.last_layer].delch(location.last_y, location.last_x)
+        pads[render.last_layer].insch(location.last_y, location.last_x, ' ')
         pads[render.layer].addch(location.y, location.x,
                                  render.glyph)
 
+        render.last_layer = render.layer
         refreshee = Refresh.pop()
 
     camera_entity = Camera.active
     camera_loc = Location.get_component(entity=camera_entity)
 
+    # delete anything whose location was removed
+    while Location.just_removed:
+        entity, location = Location.just_removed.pop(0)
+        render = RenderData.get_component(entity)
+        pads[render.last_layer].delch(location.last_y, location.last_x)
+        pads[render.last_layer].insch(location.last_y, location.last_x, ' ')
+
     # I've fixed all the off-by-ones so this should be correct
     for layer in range(NUM_RENDER_LAYERS):
         pads[layer].overlay(stdscr, camera_loc.y - SCREEN_HEIGHT // 2,
                             camera_loc.x - SCREEN_HEIGHT // 2,
-                            0, 0, SCREEN_HEIGHT - 1, SCREEN_WIDTH - 1)
+                            1, 1, SCREEN_HEIGHT, SCREEN_WIDTH)
+
+    # log player health
+    # TODO: get FOV working so we can see enemies in view
+    stat_log.addstr(1, 1,
+                    "HP: {!s}".format(HP.get_component(Player.active).value))
+    stat_log.addstr(2, 1,
+                    "ATK: {!s}".format(ATK.get_component(Player.active).value))
+    stat_log.addstr(3, 1,
+                    "DEF: {!s}".format(DEF.get_component(Player.active).value))
+
+    # log whatever happened this turn
+    log_event = Log.pop()
+    while log_event:
+        msg_log.addstr("{!s}\n".format(log_event.log_str))
+        log_event = Log.pop()
+
     stdscr.refresh()
+    msg_log.refresh()
+    stat_log.refresh()
 
 
 def terminate_render(stdscr):

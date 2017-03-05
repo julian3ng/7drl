@@ -11,6 +11,7 @@ Empty components are used to add behavior without any particular data
 attached to it beyond that an entity has that component.
 """
 from constants import *
+#from events import fire, ComponentAdded, ComponentRemoved
 from entity import Entity
 
 
@@ -24,6 +25,7 @@ class Component(object):
     @classmethod
     def initialize(cls):
         cls.table = {}
+        cls.just_removed = []
 
     @classmethod
     def add_to(cls, entity, *args, **kwargs):
@@ -38,7 +40,9 @@ class Component(object):
         """
         Remove this component from the given entity
         """
-        cls.table.pop(entity, None)
+        component_removed = cls.table.pop(entity, None)
+        if component_removed is not None:
+            cls.just_removed.append((entity, component_removed))
 
     @classmethod
     def rm_group_from(cls, entity):
@@ -122,7 +126,6 @@ class Location(Component):
     def out_of_bounds(l):
         """ Return whether or not a location is out of bounds """
         return not in_bounds(l.x, l.y)
-        #return l.x < 0 or l.x >= MAP_WIDTH or l.y < 0 or l.y >= MAP_HEIGHT
 
 
 class RenderData(Component):
@@ -132,6 +135,7 @@ class RenderData(Component):
     """
     def __init__(self, layer, glyph):
         self.layer = layer
+        self.last_layer = layer
         self.glyph = glyph
 
 
@@ -151,7 +155,7 @@ class NPC(AI):
 class Prop(AI):
     pass
 
-    
+
 class Camera(AI):
     # the camera gets to be a little special too
     active = None
@@ -206,7 +210,7 @@ class Inventory(Component):
 
 
 # Tile components below?
-class AdjacentContainer(Component):
+class AdjList(Component):
     """
     Contain adjacency data for a tile
     """
@@ -214,7 +218,7 @@ class AdjacentContainer(Component):
         self.neighbors = neighbors
 
 
-class EntityContainer(Component):
+class EntityList(Component):
     """
     Contain whatever entity lives here
     """

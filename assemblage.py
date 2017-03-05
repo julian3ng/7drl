@@ -1,5 +1,5 @@
 import logging
-from entity import Entity, Tile
+from entity import Entity
 from components import *
 from events import *
 
@@ -29,6 +29,7 @@ class Assemblage(object):
         Collideable.add_to(entity=e, blocks=True)
         Inventory.add_to(entity=e, capacity=10)
         fire(Refresh(e))
+        return e
 
     @staticmethod
     def Camera():
@@ -36,25 +37,10 @@ class Assemblage(object):
         Camera.add_to(entity=e)
         Camera.active = e
         Location.add_to(entity=e, x=4, y=4)
-        RenderData.add_to(entity=e, layer=MID_FRONT, glyph="*")
-        fire(Refresh(e))
+#        RenderData.add_to(entity=e, layer=MID_FRONT, glyph="*")
+ 
+        return e
 
-    @staticmethod
-    def Map(width, height):
-        the_map = [[Tile.create(x, y) for y in range(height)]
-                   for x in range(width)]
-
-        # link up all the tiles
-        for x, row in enumerate(the_map):
-            for y, tile in enumerate(row):
-                neighbors = [(x + i, y + j) for i in range(-1, 2)
-                             for j in range(-1, 2)
-                             if not (i == 0) and (j == 0)
-                             if in_bounds(x + i, y + j)]
-                AdjacentContainer.add_to(entity=tile, neighbors=neighbors)
-                EntityContainer.add_to(entity=tile, entities=[])
-
-        return the_map
     @staticmethod
     def Orc(x, y):
         e = Entity.create()
@@ -65,6 +51,7 @@ class Assemblage(object):
         RenderData.add_to(entity=e, layer=FRONT, glyph="o")
         Collideable.add_to(entity=e, blocks=True)
         fire(Refresh(e))
+        return e
 
     @staticmethod
     def Floor(x, y):
@@ -72,6 +59,9 @@ class Assemblage(object):
         Location.add_to(entity=e, x=x, y=y)
         RenderData.add_to(entity=e, layer=BACK, glyph='.')
         fire(Refresh(e))
+        AdjList.add_to(entity=e, neighbors=[])
+        EntityList.add_to(entity=e, entities=[])
+        return e
 
     @staticmethod
     def Wall(x, y):
@@ -79,7 +69,10 @@ class Assemblage(object):
         Location.add_to(entity=e, x=x, y=y)
         RenderData.add_to(entity=e, layer=BACK, glyph='#')
         Collideable.add_to(entity=e, blocks=True)
+        AdjList.add_to(entity=e, neighbors=[])
+        EntityList.add_to(entity=e, entities=[])
         fire(Refresh(e))
+        return e
 
     @staticmethod
     def Sword(x, y):
@@ -88,3 +81,4 @@ class Assemblage(object):
         Location.add_to(entity=e, x=x, y=y)
         RenderData.add_to(entity=e, layer=MID, glyph=")")
         Carriable.add_to(entity=e)
+        return e

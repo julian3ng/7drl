@@ -19,9 +19,9 @@ from random import randint
 class Engine(object):
     component_classes = [Location, RenderData, AI, Player, NPC, Camera,
                          HP, ATK, DEF, Collideable, Carriable, Inventory,
-                         Prop, AdjacentContainer, EntityContainer]
+                         Prop, AdjList, EntityList]
     event_classes = [ActorMoved, ActorPickup, Collision, Damage, Death,
-                     Refresh, AbortTurn, Quit]
+                     Refresh, AbortTurn, Log, Quit]
     stdscr = None
     pads = None
 
@@ -33,11 +33,7 @@ class Engine(object):
         for ec in Engine.event_classes:
             ec.initialize()
 
-        Engine.stdscr = initialize_render()
-
-        # Don't screw with this! It works!
-        Engine.pads = [curses.newpad(MAP_HEIGHT + 1, MAP_WIDTH + 1)
-                       for _ in range(NUM_RENDER_LAYERS)]
+        Engine.render_data = initialize_render()
 
     @staticmethod
     def main():
@@ -49,30 +45,28 @@ class Engine(object):
                 update_collisions()
                 resolve_damage()
                 resolve_death()
-                resolve_action() # not sure what order these all happen in 
+                resolve_action()  # not sure what order these all happen in 
             update_camera()
-            update_render(Engine.stdscr, Engine.pads)
-            fire_player_action(Engine.stdscr.getkey())
+            update_render(*Engine.render_data)
+            fire_player_action(Engine.render_data[0].getkey())
             while AbortTurn.pop():
                 fire_player_action(Engine.stdscr.getkey())
             fire_npc_actions()
             turn_count += 1
+
     @staticmethod
     def terminate():
-        terminate_render(Engine.stdscr)
+        terminate_render(Engine.render_data[0])
 
 
 if __name__ == "__main__":
     logging.basicConfig(filename="./log", filemode="w", level=logging.INFO)
     Engine.initialize()
-    Assemblage.Player(x=0, y=0)
+    Assemblage.Player(x=10, y=10)
     Assemblage.Camera()
-    Assemblage.Orc(x=5, y=0)
-    Assemblage.Sword(x=0, y=1)
+    Assemblage.Orc(x=5, y=2)
+    Assemblage.Sword(x=1, y=1)
 
-
-    for i in range(MAP_WIDTH):
-        for j in range(MAP_HEIGHT):
-            Assemblage.Floor(i, j)
+    generate_map()
     Engine.main()
     Engine.terminate()

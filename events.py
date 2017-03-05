@@ -82,6 +82,11 @@ class Refresh(Event):
         self.erase = False
 
 
+class Log(Event):
+    def __init__(self, log_str):
+        self.log_str = log_str
+
+
 class AbortTurn(Event):
     pass
 
