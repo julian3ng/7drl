@@ -58,6 +58,33 @@ class ActorPickup(Event):
         self.entity = entity
 
 
+class ActorChangeLevel(Event):
+    def __init__(self, z, entity):
+        self.z = z
+        self.entity = entity
+
+    def execute(self):
+        entity_depth = Depth.get_component(entity=self.entity)
+        entity_depth.last_z = entity_depth.z
+        entity_depth.z = self.z
+
+    def undo(self):
+        entity_depth = Depth.get_component(entity=self.entity)
+        entity_depth.last_z = entity_depth.z
+
+
+class TIMEPulse(Event):
+    def __init__(self, actor, target):
+        self.actor = actor
+        self.target = target
+
+
+class TIMESiphon(Event):
+    def __init__(self, actor, target):
+        self.actor = actor
+        self.target = target
+
+
 class Collision(Event):
     def __init__(self, initiator, receiver, action):
         self.initiator = initiator
@@ -66,6 +93,12 @@ class Collision(Event):
 
 
 class Damage(Event):
+    def __init__(self, dmg, target):
+        self.dmg = dmg
+        self.target = target
+
+
+class TimeDamage(Event):
     def __init__(self, dmg, target):
         self.dmg = dmg
         self.target = target
@@ -82,9 +115,25 @@ class Refresh(Event):
         self.erase = False
 
 
+class ClearScreen(Event):
+    pass
+
+
+class Descent(Event):
+    pass
+
+
+class Ascent(Event):
+    pass
+
+
 class Log(Event):
     def __init__(self, log_str):
         self.log_str = log_str
+
+
+class Win(Event):
+    pass
 
 
 class AbortTurn(Event):

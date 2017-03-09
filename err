@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "ecs.py", line 78, in <module>
-    Engine.main()
-  File "ecs.py", line 45, in main
-    generate_map(Assemblage.Map(MAP_WIDTH, MAP_HEIGHT))
-  File "/Users/julian/Documents/Programming/projects/ecs_final/systems.py", line 19, in generate_map
-    for row in the_map:
-TypeError: 'NoneType' object is not iterable

@@ -11,7 +11,6 @@ Empty components are used to add behavior without any particular data
 attached to it beyond that an entity has that component.
 """
 from constants import *
-#from events import fire, ComponentAdded, ComponentRemoved
 from entity import Entity
 
 
@@ -109,6 +108,13 @@ class Component(object):
         return "\n".join("{!s}: {!s}".format(k, v)
                          for k, v in cls.table.items())
 
+    @classmethod
+    def cleanup(cls):
+        cls.just_removed = []
+        if len(cls.__subclasses__()) > 0:
+            for subclass in cls.__subclasses__():
+                subclass.cleanup()
+
 
 class Location(Component):
     def __init__(self, x, y):
@@ -126,6 +132,27 @@ class Location(Component):
     def out_of_bounds(l):
         """ Return whether or not a location is out of bounds """
         return not in_bounds(l.x, l.y)
+
+    @staticmethod
+    def distance2(l1, l2):
+        """ Return the square distance between these two locations """
+        return (l1.x - l2.x)**2 + (l1.y - l2.y)**2
+
+    @staticmethod
+    def direction(l1, l2):
+        """ Return a vector from l1 to l2 """
+        from numpy import sign
+        return tuple(sign([l2.x - l1.x, l2.y - l1.y]))
+
+
+class Depth(Component):
+    def __init__(self, z):
+        self.z = z
+        self.last_z = z
+
+    @staticmethod
+    def same_level(d1, d2):
+        return d1.z == d2.z
 
 
 class RenderData(Component):
@@ -190,6 +217,16 @@ class DEF(Stat):
     pass
 
 
+class TIME(Stat):
+    def __init__(self, value, decay_rate):
+        self.value = value
+        self.decay_rate = decay_rate
+
+
+class Faction(Stat):
+    pass
+
+
 class Carriable(Component):
     """
     Things with this component can be picked up
@@ -202,11 +239,21 @@ class Inventory(Component):
     Has slots to hold things with Carriable
     """
     def __init__(self, capacity):
-        from itertools import chain
         self.capacity = min(capacity, INV_MAX)
         self.slots = {chr(x): None
-                      for x in chain(range(ord('a'), ord('z')),
-                                     range(ord('A'), ord('Z')))}
+                      for x in range(ord('a'), ord('a') + 4)}
+
+
+class Yendor(Component):
+    pass
+
+
+class OnDeath(Component):
+    """
+    Define what happens when this thing's HP drops to 0
+    """
+    def __init__(self, death_function):
+        self.death_function = death_function
 
 
 # Tile components below?
@@ -224,3 +271,19 @@ class EntityList(Component):
     """
     def __init__(self, entities=[]):
         self.entities = entities
+
+
+class Descender(Component):
+    """
+    Stairs that go down
+    """
+    def __init__(self, down):
+        self.down = down
+
+
+class Ascender(Component):
+    """
+    Stairs that go up
+    """
+    def __init__(self, up):
+        self.up = up
