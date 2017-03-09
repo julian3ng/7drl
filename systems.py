@@ -126,6 +126,7 @@ def populate_dungeon(dungeon, depth):
             spawn(dungeon, floor, Assemblage.Player)
         for _ in range(5):
             spawn(dungeon, floor, Assemblage.Zombie)
+        if randint(0, 99) < 10:
             spawn(dungeon, floor, Assemblage.Wight)
 
         if floor == DUNGEON_DEPTH:
@@ -359,6 +360,16 @@ def update_TIME():
                 fire(Death(entity))
 
 
+def update_timers():
+    timed = Component.entities_with(Timer)
+
+    for timed_one in timed:
+        timer = Timer.get_component(timed_one)
+        timer.time += 1
+        if timer.time == timer.max_time:
+            timer.time = 0
+            fire(Heal(timed_one))
+
 def resolve_action():
     pickup_event = ActorPickup.pop()
 
@@ -413,6 +424,16 @@ def update_collisions():
     if atk is not None:
         fire(Damage(atk.value, c.receiver))
         fire(TIMESiphon(c.initiator, c.receiver))
+
+
+def resolve_heals():
+    h = Heal.pop()
+
+    while h is not None:
+        target_hp = HP.get_component(h.actor)
+        if target_hp is not None and target_hp.value < 10:
+            target_hp.value += 1
+        h = Heal.pop()
 
 
 def resolve_damage():

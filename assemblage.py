@@ -26,6 +26,7 @@ class Assemblage(object):
         ATK.add_to(entity=e, value=2)
         DEF.add_to(entity=e, value=1)
         TIME.add_to(entity=e, value=1000, decay_rate=1)
+        Timer.add_to(entity=e, max_time=20)
         Location.add_to(entity=e, x=x, y=y)
         Depth.add_to(entity=e, z=z)
         RenderData.add_to(entity=e, layer=FRONT, glyph="@")

@@ -205,6 +205,12 @@ class Stat(Component):
         self.value = value
 
 
+class Timer(Component):
+    def __init__(self, max_time):
+        self.time = 0
+        self.max_time = max_time
+
+
 class HP(Stat):
     pass
 

@@ -46,7 +46,7 @@ class Engine(object):
         turn_count = 0
         while not (Quit.peek() or Win.peek()):
             logging.info("===TURN %s===", turn_count)
-
+            update_timers()
             while (ActorMoved.queue or ActorPickup.queue or
                    Descent.queue or Ascent.queue):
                 update_depth()
@@ -55,7 +55,7 @@ class Engine(object):
                 resolve_level_change()
                 resolve_special()
                 resolve_action()  # not sure what order these all happen in
-
+            resolve_heals()
             resolve_damage()
             resolve_time_siphon()
             update_TIME()

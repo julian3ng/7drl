@@ -140,6 +140,11 @@ class AbortTurn(Event):
     pass
 
 
+class Heal(Event):
+    def __init__(self, actor):
+        self.actor = actor
+
+
 class Quit(Event):
     pass
 
